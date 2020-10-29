@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"checkin/models"
-	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,19 +15,14 @@ func JSONMiddleware() gin.HandlerFunc {
 func POSTHandler(route string, r *gin.Engine) {
 
 	handler := r.Group(route)
-	//handler.Use(JSONMiddleware())
 	handler.POST("/add", func(con *gin.Context) {
 
-		currentList := models.GetInstance()
 		var bindItem models.Checkin
 		if err := con.ShouldBindJSON(&bindItem); err != nil {
 			con.AbortWithError(400, err)
 		} else {
-			currentList.AddCheckin(&bindItem)
-			for _, item := range currentList.GetCheckins() {
-				fmt.Println(item.UserId)
-			}
-			con.JSON(200, gin.H{"message": "Checked in."})
+			response, status := bindItem.AddCheckin()
+			con.JSON(status, gin.H{"code": status, "result": map[string]string{"message": response}})
 		}
 	})
 

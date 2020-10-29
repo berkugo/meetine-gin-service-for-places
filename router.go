@@ -9,5 +9,6 @@ import (
 func SetRoutesForEngine(r *gin.Engine) {
 
 	handlers.POSTHandler("/checkin", r)
+	handlers.GETHandler("/checkin", r)
 
 }

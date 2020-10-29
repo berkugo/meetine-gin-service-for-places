@@ -1,27 +1,33 @@
 package models
 
-var checkinListInstance *CheckinList = &CheckinList{}
+import (
+	"checkin/request"
+	"encoding/json"
+	"strings"
+)
 
 type Checkin struct {
 	PlaceId string `json:"placeId" binding:"required"`
 	UserId  string `json:"userId" binding:"required"`
 	Note    string `json:"note" binding:"required"`
 	Ctype   int    `json:"type" binding:"required"`
+	City    string `json:"city" binding:"required"`
 }
 
-type CheckinList struct {
-	items []*Checkin
-}
+func (ins *Checkin) AddCheckin() (string, int) {
 
-func GetInstance() *CheckinList {
-	return checkinListInstance
-}
+	if ins != nil {
+		values := map[string]interface{}{"placeid": ins.PlaceId, "uid": ins.UserId, "note": ins.Note, "ctype": ins.Ctype, "city": strings.ToLower(ins.City)}
+		jsonValue, _ := json.Marshal(values)
+		resp, err, status := request.SendPostRequestForInsert(jsonValue)
+		if err != nil {
+			return "Error.", status
+		} else {
+			return resp, status
+		}
 
-func (ins *CheckinList) AddCheckin(item *Checkin) {
+	} else {
+		return "Error.", 404
 
-	ins.items = append(ins.items, item)
-}
-
-func (ins *CheckinList) GetCheckins() []*Checkin {
-	return ins.items
+	}
 }
